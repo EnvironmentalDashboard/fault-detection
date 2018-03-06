@@ -286,15 +286,15 @@ class BuildingOS {
       if ($delete_not_found) { // Delete buildings in db not found in $buildings
         $bos_ids = array_column($buildings, ':id');
         foreach ($this->db->query("SELECT id FROM buildings") as $building) {
-          if (!in_array($building['id'], $bos_ids)) {
+          if (!in_array($building[':bos_id'], $bos_ids)) {
             $stmt = $this->db->prepare('DELETE FROM buildings WHERE id = ?');
-            $stmt->execute(array($building['id']));
+            $stmt->execute(array($building[':bos_id']));
             // also delete meters that belong to those buildings
             $stmt = $this->db->prepare('DELETE FROM meters WHERE building_id = ?');
-            $stmt->execute(array($building['id']));
+            $stmt->execute(array($building[':bos_id']));
             // also delete data from meter_data table
             $stmt = $this->db->prepare('DELETE FROM meter_data WHERE meter_id IN (SELECT id FROM meters WHERE building_id = ?)');
-            $stmt->execute(array($building['id']));
+            $stmt->execute(array($building[':bos_id']));
           }
         }
       }
