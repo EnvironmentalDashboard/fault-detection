@@ -284,7 +284,7 @@ class BuildingOS {
     echo "Fetched all buildings\n";
     if ($buildings !== false) {
       if ($delete_not_found) { // Delete buildings in db not found in $buildings
-        $bos_ids = array_column($buildings, ':id');
+        $bos_ids = array_column($buildings, ':bos_id');
         foreach ($this->db->query("SELECT id FROM buildings") as $building) {
           if (!in_array($building[':bos_id'], $bos_ids)) {
             $stmt = $this->db->prepare('DELETE FROM buildings WHERE id = ?');
@@ -301,7 +301,7 @@ class BuildingOS {
       $counter = 0;
       foreach ($buildings as $building) {
         echo "Processing building " . (++$counter) . " out of " . count($buildings) . "\n";
-        $building_id = $building[':id'];
+        $building_id = $building[':bos_id'];
         $stmt = $this->db->prepare('SELECT COUNT(*) FROM buildings WHERE id = ?');
         $stmt->execute(array($building_id));
         if ($stmt->fetchColumn() === '0') { // building doesnt exist in db
