@@ -301,8 +301,8 @@ class BuildingOS {
         $stmt = $this->db->prepare('SELECT COUNT(*) FROM buildings WHERE id = ?');
         $stmt->execute(array($building_id));
         if ($stmt->fetchColumn() === '0') { // building doesnt exist in db
-          $stmt = $this->db->prepare('INSERT INTO buildings (id, org_id, name, type, address, loc, area, occupancy, floors) VALUES (:id, :org_id, :name, :type, :address, :loc, :area, :occupancy, :numFloors)');
-          foreach (array(':id', ':org_id', ':name', ':type', ':address', ':loc', ':area', ':occupancy', ':numFloors') as $param) {
+          $stmt = $this->db->prepare('INSERT INTO buildings (bos_id, name, building_type, address, loc, area, occupancy, floors, img, org_id) VALUES (:bos_id, :name, :building_type, :address, :loc, :area, :occupancy, :numFloors, :image, :org_id)');
+          foreach (array(':bos_id', ':name', ':building_type', ':address', ':loc', ':area', ':occupancy', ':numFloors', ':image', ':org_id') as $param) {
             $stmt->bindValue($param, $building[$param]);
           }
           $stmt->execute();
