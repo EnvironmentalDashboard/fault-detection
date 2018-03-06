@@ -142,15 +142,16 @@ class BuildingOS {
         echo "Fetched building: {$building['name']}\n";
         $org_id = $this->orgURLtoID($building['organization']);
         $buffer[$i] = array( // make an array that can be fed directly into a query 
-          ':id' => $building['id'],
-          ':org_id' => $org_id,
+          ':bos_id' => $building['id'],
           ':name' => $building['name'],
-          ':type' => $building['buildingType']['displayName'],
+          ':building_type' => $building['buildingType']['displayName'],
           ':address' => "{$building['address']} {$building['postalCode']}",
           ':loc' => "{$building['location']['lat']},{$building['location']['lon']}",
           ':area' => ($building['area'] == '') ? 0 : $building['area'],
           ':occupancy' => $building['occupancy'],
           ':numFloors' => $building['numFloors'],
+          ':image' => $building['image'],
+          ':org_id' => $org_id,
           'meters' => array() // remove if feeding directly into query
         );
         foreach ($building['meters'] as $meter) {
@@ -161,13 +162,16 @@ class BuildingOS {
           }
           $meter_json = json_decode($meter_result, true);
           $arr = array(
-            ':uuid' => $meter_json['data']['uuid'],
+            ':bos_uuid' => $meter_json['data']['uuid'],
             ':building_id' => null, // need to fill this in later if inserting into db
+            ':source' => 'buildingos',
             ':scope' => $meter_json['data']['scope']['displayName'],
             ':resource' => $meter_json['data']['resourceType']['displayName'],
             ':name' => $meter_json['data']['displayName'],
             ':url' => $meter_json['data']['url'],
-            ':units' => $meter_json['data']['displayUnit']['displayName']
+            ':building_url' => $meter_json['data']['building'],
+            ':units' => $meter_json['data']['displayUnit']['displayName'],
+            ':org_id' => $org_id
           );
           $buffer[$i]['meters'][$j] = $arr;
           $j++;
@@ -327,7 +331,7 @@ class BuildingOS {
           $stmt->execute(array($meter[':url']));
           if ($stmt->fetchColumn() === '0') { // meter is not in db
             $meter[':building_id'] = $building_id;
-            $stmt = $this->db->prepare('INSERT INTO meters (uuid, building_id, scope, resource, name, url, units) VALUES (:uuid, :building_id, :scope, :resource, :name, :url, :units)');
+            $stmt = $this->db->prepare('INSERT INTO meters (bos_uuid, building_id, source, scope, resource, name, url, building_url, units, org_id) VALUES (:bos_uuid, :building_id, :source, :scope, :resource, :name, :url, :building_url, :units, :org_id)');
             $stmt->execute($meter);
           }
         }
