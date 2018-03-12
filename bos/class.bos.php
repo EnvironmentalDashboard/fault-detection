@@ -234,7 +234,7 @@ class BuildingOS {
       $start = $last_recording;
       $end = $start + $chunk;
       while (true) {
-        $tmp = $this->getMeter($meter_url, $res, $start, $end);
+        $tmp = $this->getMeter($meter_url, $res, $start, $end, true);
         if ($tmp === false) {
           echo "Error fetching data for meter {$meter_id} from {$start} to {$end}\n";
         }
@@ -247,7 +247,7 @@ class BuildingOS {
         }
       }
     } else {
-      $meter_data = $this->getMeter($meter_url, $res, $last_recording, $time);
+      $meter_data = $this->getMeter($meter_url, $res, $last_recording, $time, true);
       if ($meter_data === false) { // file_get_contents returned false, so problem with API
         return false;
       }
