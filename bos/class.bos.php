@@ -79,7 +79,7 @@ class BuildingOS {
       if ($debug) {
         print_r($http_response_header);
       }
-      if ($http_response_header[0] === 'HTTP/1.1 429 TOO MANY REQUESTS') {
+      if (isset($http_response_header[0]) && $http_response_header[0] === 'HTTP/1.1 429 TOO MANY REQUESTS' && isset($http_response_header[5])) {
         // If it was because the API is being queried too quickly, sleep
         sleep( 1 + preg_replace('/\D/', '', $http_response_header[5]) );
       }
@@ -222,6 +222,10 @@ class BuildingOS {
    * @return [type]            [description]
    */
   public function updateMeter($meter_id, $meter_url, $res, $chunk, $data_length = '-2 years') {
+    if (!is_numeric($meter_id)) {
+      echo "\$meter_id must be numeric!\n";
+      return false;
+    }
     $time = time(); // end date
     // Get the most recent recording. Data fetched from the API will start at $last_recording and end at $time
     $stmt = $this->db->prepare('SELECT recorded FROM meter_data
