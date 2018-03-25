@@ -221,18 +221,17 @@ class BuildingOS {
    * @param   $chunk     max amount of data to request at one time
    * @return [type]            [description]
    */
-  public function updateMeter($meter_id, $meter_url, $res, $chunk, $data_length = '-2 years') {
+  public function updateMeter($meter_id, $meter_url, $res, $chunk, $start_time, $end_time) {
     if (!is_numeric($meter_id)) {
       echo "\$meter_id must be numeric!\n";
       return false;
     }
-    $time = time(); // end date
-    // Get the most recent recording. Data fetched from the API will start at $last_recording and end at $time
+    // Get the most recent recording. Data fetched from the API will start at $last_recording and end at $end_time
     $stmt = $this->db->prepare('SELECT recorded FROM meter_data
       WHERE meter_id = ? AND resolution = ? ORDER BY recorded DESC LIMIT 1');
     $stmt->execute(array($meter_id, $res));
-    $last_recording = ($stmt->rowCount() === 1) ? $stmt->fetchColumn() : strtotime($data_length); // start date
-    $diff = $time - $last_recording;
+    $last_recording = ($stmt->rowCount() === 1) ? $stmt->fetchColumn() : $start_time; // start date
+    $diff = $end_time - $last_recording;
     if ($diff > $chunk) {
       $meter_data = array();
       $start = $last_recording;
@@ -246,12 +245,12 @@ class BuildingOS {
         $meter_data = array_merge($meter_data, $tmp);
         $start = $end;
         $end += $chunk;
-        if ($end >= $time) {
+        if ($end >= $end_time) {
           break;
         }
       }
     } else {
-      $meter_data = $this->getMeter($meter_url, $res, $last_recording, $time, true);
+      $meter_data = $this->getMeter($meter_url, $res, $last_recording, $end_time, true);
       if ($meter_data === false) { // file_get_contents returned false, so problem with API
         return false;
       }
