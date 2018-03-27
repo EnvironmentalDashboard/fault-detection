@@ -1,2 +1,1 @@
-username = 'muci'
-password = 'Allen0621'
+sqlalchemy_uri = 'mysql://muci:Allen0621@159.89.232.129:3306/envs356'
