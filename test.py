@@ -1,6 +1,8 @@
 import config
-import pandas as pd
 from sqlalchemy import create_engine
+
+import pandas as pd
+import numpy as np
 
 import matplotlib
 import seaborn
@@ -16,7 +18,7 @@ from sklearn.svm import OneClassSVM
 
 def main():
   engine = create_engine(config.sqlalchemy_uri)
-  sql = "SELECT value, recorded FROM meter_data WHERE meter_id = 343"
+  sql = "SELECT value, recorded FROM meter_data WHERE meter_id = 343 AND resolution = 'quarterhour' AND value IS NOT NULL ORDER BY recorded ASC"
   df = pd.read_sql_query(sql, engine)
   df['recorded'] = pd.to_datetime(df['recorded'], unit='s')
   df['hours'] = df['recorded'].dt.hour
