@@ -1,3 +1,7 @@
 pandas
 mysqlclient
 sqlalchemy
+numpy
+matplotlib
+seaborn
+sklearn
