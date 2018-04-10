@@ -15,7 +15,7 @@ from sklearn.cluster import KMeans
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
 from sklearn.svm import OneClassSVM
-#from pyemma import msm
+from pyemma import msm
 
 
 def main():
