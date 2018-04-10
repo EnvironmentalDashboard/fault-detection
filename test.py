@@ -50,11 +50,9 @@ def main():
   ax.bar(c_bins[:-1]+width*2, (c_heights*100/c.count()), width=width, facecolor='red', label ='WeekDayNight')
   ax.bar(d_bins[:-1]+width*3, (d_heights*100/d.count()), width=width, facecolor='black', label ='WeekDayLight')
 
-
+  print(df.info())
+  print(df.head())
   plt.legend()
   plt.show()
-  print(df.head())
-  print(df.info())
-  #print(df.loc['value' == 0])
 
 main()
