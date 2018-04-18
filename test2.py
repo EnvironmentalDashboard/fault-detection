@@ -15,7 +15,7 @@ from sklearn.cluster import KMeans
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
 from sklearn.svm import OneClassSVM
-from pyemma import msm
+# from pyemma import msm
 
 
 def main():
@@ -43,12 +43,29 @@ def main():
     print(data.value.describe())
 
     qlist = defineStates(data)
-    df_mm = markovStates(df,qlist)
-
+    df_mm = markovStates(data,qlist)
+    print("==========stats===========")
+    print(min(df_mm))
+    print(sum(df_mm)/len(df_mm))
+    #
+    # tm = transition_matrix(df_mm)
+    # print(tm)
     # getting the anomaly labels for our dataset (evaluating sequence of 5 values and anomaly = less than 20% probable)
-    df_anomaly = markovAnomaly(df_mm, 5, 0.20)
+    df_anomaly = markovAnomaly(df_mm, 32, 0.20)
     df_anomaly = pd.Series(df_anomaly)
     print(df_anomaly.value_counts())
+
+    # add the data to the main
+    df['anomaly24'] = df_anomaly
+
+    # visualisation of anomaly throughout time (viz 1)
+    fig, ax = plt.subplots()
+
+    a = df.loc[df['anomaly24'] == 1, ('time_epoch', 'value')]  # anomaly
+
+    ax.plot(df['time_epoch'], df['value'], color='blue')
+    ax.scatter(a['time_epoch'], a['value'], color='red')
+    plt.show()
 
 def standardize(df):
     data = df[['value', 'hours', 'daylight', 'DayOfTheWeek', 'WeekDay']]
@@ -70,16 +87,37 @@ def defineStates(df):
 def markovStates(df, qlist):
     # definition of the different state
     print(qlist)
+    print(df['value'])
     x1 = (df['value'] <= qlist[0]).astype(int)
     x2 = ((df['value'] > qlist[0]) & (df['value'] <= qlist[1])).astype(int)
     x3 = ((df['value'] > qlist[1]) & (df['value'] <= qlist[2])).astype(int)
     x4 = ((df['value'] > qlist[2]) & (df['value'] <= qlist[3])).astype(int)
     x5 = (df['value'] > qlist[3]).astype(int)
     df_mm = x1 + 2 * x2 + 3 * x3 + 4 * x4 + 5 * x5
+    # df_mm = x1 + x2 + x3 + x4 + x5
+
+    print("==========df_mm==========\n",df_mm)
     return df_mm
 
+#create a transition matrix
+def transition_matrix_fcn(transitions):
+    n = 1+ max(transitions) #number of states
+
+    M = [[0]*n for _ in range(n)]
+
+    for (i,j) in zip(transitions,transitions[1:]):
+        M[i][j] += 1
+
+    #now convert to probabilities:
+    for row in M:
+        s = sum(row)
+        if s > 0:
+            row[:] = [f/s for f in row]
+    return M
+
 def markovAnomaly(df, windows_size, threshold):
-    transition_matrix = getTransitionMatrix(df)
+    transition_matrix = transition_matrix_fcn(df)
+    print(transition_matrix)
     real_threshold = threshold ** windows_size
     df_anomaly = []
     for j in range(0, len(df)):
@@ -125,6 +163,22 @@ def getTransitionMatrix(df):
     df = np.array(df)
     model = msm.estimate_markov_model(df, 1)
     return model.transition_matrix
+
+#create a transition matrix
+def transition_matrix(transitions):
+    n = 1+ max(transitions) #number of states
+
+    M = [[0]*n for _ in range(n)]
+
+    for (i,j) in zip(transitions,transitions[1:]):
+        M[i][j] += 1
+
+    #now convert to probabilities:
+    for row in M:
+        s = sum(row)
+        if s > 0:
+            row[:] = [f/s for f in row]
+    return M
 
 
 main()
