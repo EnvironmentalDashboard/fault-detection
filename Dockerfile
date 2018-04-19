@@ -7,8 +7,10 @@ COPY requirements.txt /src/requirements.txt
 WORKDIR /src
 RUN apt-get update && \
   apt-get -qq -y install apt-utils tzdata python python-pip python-tk libmysqlclient-dev apache2 php libapache2-mod-php php-mcrypt php-mysql curl && \
-  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && rm -rf /var/www/html && ln -snf /src/html /var/www/html && \
-  pip install -r requirements.txt
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
+  rm -rf /var/www/html && ln -snf /src/html /var/www/html && \
+  pip install -r requirements.txt && \
+  a2enmod ssl && echo "159.89.232.129 monitor-meters.environmentaldashboard.org" >> /etc/hosts
 # start webserver
 EXPOSE 80 443
 #CMD ["python", "test.py"]
