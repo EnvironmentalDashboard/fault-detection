@@ -11,12 +11,12 @@ require '../bos/db.php';
     <link rel="stylesheet" href="css/bootstrap.css">
     <title>Leak Detection</title>
   </head>
-  <body>
+  <body style="background: #e9ecef">
     <div class="container" style="margin-top: 20px">
       <div class="row">
         <div class="col-sm-8">
           <h2 class="text-muted text-center">No meters are being monitored; select from this list on the right</h2>
-          <table class="table">
+          <table class="table table-striped table-dark">
             <thead>
               <tr>
                 <th scope="col">Meter</th>
@@ -40,7 +40,7 @@ require '../bos/db.php';
           <h4>Unmonitored Meters</h4>
           <form action="">
             <?php foreach ($db->query('SELECT bos_id, name FROM buildings WHERE bos_id IN (SELECT building_id FROM meters WHERE resource = \'Water\') ORDER BY name ASC') as $building) {
-              echo "<h6>{$building['name']}</h6><ul class='list-group' style='margin-bottom:20px'>";
+              echo "<h6>{$building['name']}</h6><ul class='list-group list-group-flush' style='margin-bottom:20px'>";
               foreach ($db->query("SELECT id, name FROM meters WHERE building_id = {$building['bos_id']} AND resource = 'Water' ORDER BY name ASC") as $meter) {
                 echo "<li class='list-group-item' data-name='{$building['name']} {$meter['name']}' data-id='{$meter['id']}' id='unselected{$meter['id']}' style='cursor:pointer'>{$meter['name']}</li>";
               }
@@ -57,7 +57,7 @@ require '../bos/db.php';
     $('.list-group-item').on('click', function(e) {
       e.preventDefault();
       var id = $(this).data('id'), name = $(this).data('name');
-      $('#tbody').append('<tr id="meter'+id+'"><td>'+name+'</td><td>Never</td><td>&middot;</td><td><a href="#" class="btn btn-default remove-btn" data-meterid="'+id+'"><span style="font-weight:900;font-size:1rem">&times;</span></a></td></tr>');
+      $('#tbody').append('<tr id="meter'+id+'"><td>'+name+'</td><td>Never</td><td>&middot;</td><td><a href="#" class="close btn remove-btn" data-meterid="'+id+'"><span>&times;</span></a></td></tr>');
       $(this).hide();
     });
     $(document).on('click', '.remove-btn', function(e) { // https://stackoverflow.com/a/1207393/2624391
