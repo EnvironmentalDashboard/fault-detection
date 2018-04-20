@@ -9,7 +9,7 @@ RUN apt-get update && \
   apt-get -qq -y install apt-utils tzdata python python-pip python-tk libmysqlclient-dev apache2 php libapache2-mod-php php-mcrypt php-mysql curl && \
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
   rm -rf /var/www/html && ln -snf /src/html /var/www/html && \
-  pip install -r requirements.txt && \
+  pip install -r requirements.txt
 # start webserver
 EXPOSE 80
 #CMD ["python", "test.py"]
