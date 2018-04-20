@@ -10,8 +10,7 @@ RUN apt-get update && \
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
   rm -rf /var/www/html && ln -snf /src/html /var/www/html && \
   pip install -r requirements.txt && \
-  a2enmod ssl && echo "159.89.232.129 monitor-meters.environmentaldashboard.org" >> /etc/hosts
 # start webserver
-EXPOSE 80 443
+EXPOSE 80
 #CMD ["python", "test.py"]
 CMD /usr/sbin/apache2ctl -D FOREGROUND
