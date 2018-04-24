@@ -1,7 +1,17 @@
 <?php
 error_reporting(-1);
 ini_set('display_errors', 'On');
-require '../bos/db.php';
+require '../db.php';
+if (isset($_COOKIE['user_id'])) {
+  $user_id = $_COOKIE['user_id'];
+} else {
+  header('Location: /?err=not_logged_in'); exit();
+}
+
+$stmt = $db->prepare('SELECT * FROM meters WHERE id IN (SELECT meter_id FROM active_meters WHERE user_id = ?)');
+$stmt->execute([$user_id]);
+$active_meters = $stmt->fetchAll();
+$active_meters_ids = implode(',', array_column($active_meters, 'id'));
 ?>
 <!doctype html>
 <html lang="en">
@@ -15,7 +25,9 @@ require '../bos/db.php';
     <div class="container" style="margin-top: 20px">
       <div class="row">
         <div class="col-sm-8">
-          <h2 class="text-muted text-center">No meters are being monitored; select from this list on the right</h2>
+          <?php if (count($active_meters) === 0) {
+            echo '<h2 class="text-muted text-center">No meters are being monitored; select from this list on the right</h2>';
+          } else { ?>
           <table class="table table-striped table-dark">
             <thead>
               <tr>
@@ -26,8 +38,12 @@ require '../bos/db.php';
               </tr>
             </thead>
             <tbody id="tbody">
+              <?php foreach ($active_meters as $meter) {
+                echo "<tr id='meter{$meter['id']}'><td>{$meter['name']}</td><td>Never</td><td>&middot;</td><td><a href='#' class='close btn remove-btn' data-meterid='{$meter['id']}'><span>&times;</span></a></td></tr>";
+              } ?>
             </tbody>
           </table>
+          <?php } ?>
         </div>
         <div class="col-sm-4">
           <h4>Notified emails</h4>
@@ -38,15 +54,13 @@ require '../bos/db.php';
             <button type="submit" class="btn btn-primary mb-2">Add</button>
           </form>
           <h4>Unmonitored Meters</h4>
-          <form action="">
-            <?php foreach ($db->query('SELECT bos_id, name FROM buildings WHERE bos_id IN (SELECT building_id FROM meters WHERE resource = \'Water\') ORDER BY name ASC') as $building) {
-              echo "<h6>{$building['name']}</h6><ul class='list-group list-group-flush' style='margin-bottom:20px'>";
-              foreach ($db->query("SELECT id, name FROM meters WHERE building_id = {$building['bos_id']} AND resource = 'Water' ORDER BY name ASC") as $meter) {
-                echo "<li class='list-group-item' data-name='{$building['name']} {$meter['name']}' data-id='{$meter['id']}' id='unselected{$meter['id']}' style='cursor:pointer'>{$meter['name']}</li>";
-              }
-              echo "</ul>";
-            } ?>
-          </form>
+          <?php foreach ($db->query("SELECT bos_id, name FROM buildings WHERE bos_id IN (SELECT building_id FROM meters WHERE resource = 'Water' AND id NOT IN ({$active_meters_ids})) ORDER BY name ASC") as $building) {
+            echo "<h6>{$building['name']}</h6><ul class='list-group list-group-flush' style='margin-bottom:20px'>";
+            foreach ($db->query("SELECT id, name FROM meters WHERE building_id = {$building['bos_id']} AND resource = 'Water' AND id NOT IN ({$active_meters_ids}) ORDER BY name ASC") as $meter) {
+              echo "<li class='list-group-item' data-name='{$building['name']} {$meter['name']}' data-id='{$meter['id']}' id='unselected{$meter['id']}' style='cursor:pointer'>{$meter['name']}</li>";
+            }
+            echo "</ul>";
+          } ?>
         </div>
       </div>
     </div>
@@ -59,12 +73,14 @@ require '../bos/db.php';
       var id = $(this).data('id'), name = $(this).data('name');
       $('#tbody').append('<tr id="meter'+id+'"><td>'+name+'</td><td>Never</td><td>&middot;</td><td><a href="#" class="close btn remove-btn" data-meterid="'+id+'"><span>&times;</span></a></td></tr>');
       $(this).hide();
+      $.post( "includes/active_meters.php", { id: id, add: 1 } );
     });
     $(document).on('click', '.remove-btn', function(e) { // https://stackoverflow.com/a/1207393/2624391
       e.preventDefault();
       var id = $(this).data('meterid');
       $('#meter'+id).remove();
       $('#unselected'+id).show();
+      $.post( "includes/active_meters.php", { id: id, remove: 1 } );
     });
     </script>
   </body>

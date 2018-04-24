@@ -33,6 +33,13 @@
 		"oAP": "\/home.php",
 		"oF": 0
 		},
+	"\/includes\/active_meters.php": {
+		"cB": 0,
+		"ft": 8192,
+		"oA": 0,
+		"oAP": "\/includes\/active_meters.php",
+		"oF": 0
+		},
 	"\/index.html": {
 		"cB": 0,
 		"ft": 8192,

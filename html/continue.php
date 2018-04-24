@@ -1,7 +1,7 @@
 <?php
 error_reporting(-1);
 ini_set('display_errors', 'On');
-require '../bos/db.php';
+require '../db.php';
 if (isset($_POST['create_account'])) {
   $stmt = $db->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
   $stmt->execute([$_POST['account_email'], password_hash($_POST['account_password'])]);
@@ -17,6 +17,8 @@ if (isset($_POST['create_account'])) {
     $stmt = $db->prepare('INSERT INTO users_orgs_map (user_id, org_id) VALUES (?, ?)');
     $stmt->execute([$user_id, $org_id]);
   }
+  setcookie('user_id', $user_id, time()+31104000);
+  header('Location: home.php'); exit();
 }
 // Get list of orgs for form
 $data = array(
@@ -35,7 +37,6 @@ $options = array(
 $context = stream_context_create($options);
 $result = @file_get_contents('https://api.buildingos.com/o/token/', false, $context);
 if (!$result) {
-  var_dump($result);die();
   header('Location: /?err=no_token'); exit();
 }
 $json = json_decode($result, true);

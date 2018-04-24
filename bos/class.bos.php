@@ -1,7 +1,7 @@
 <?php
 date_default_timezone_set("America/New_York");
-require_once 'db.php';
-require_once 'credentials.php';
+require_once '../db.php';
+// require_once 'credentials.php';
 error_reporting(-1);
 ini_set('display_errors', 'On');
 /**
@@ -14,7 +14,7 @@ class BuildingOS {
    *
    * Sets the token for the class.
    */
-  public function __construct($db) {
+  public function __construct($db, $api) {
     $this->db = $db;
     $results = $db->query("SELECT token, token_updated FROM api LIMIT 1"); // api is a table with 1 row
     $arr = $results->fetch();
@@ -24,10 +24,10 @@ class BuildingOS {
     else { // amortized cost
       $url = 'https://api.buildingos.com/o/token/';
       $data = array(
-        'client_id' => CLIENT_ID,
-        'client_secret' => CLIENT_SECRET,
-        'username' => USERNAME,
-        'password' => PASSWORD,
+        'client_id' => $api[0],
+        'client_secret' => $api[1],
+        'username' => $api[2],
+        'password' => $api[3],
         'grant_type' => 'password'
         );
       $options = array(
