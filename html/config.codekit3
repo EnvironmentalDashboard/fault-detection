@@ -40,11 +40,11 @@
 		"oAP": "\/includes\/active_meters.php",
 		"oF": 0
 		},
-	"\/index.html": {
+	"\/index.php": {
 		"cB": 0,
 		"ft": 8192,
 		"oA": 0,
-		"oAP": "\/index.html",
+		"oAP": "\/index.php",
 		"oF": 0
 		},
 	"\/js\/bootstrap.bundle.js": {
@@ -113,6 +113,20 @@
 		"ft": 8192,
 		"oA": 0,
 		"oAP": "\/js\/bootstrap.min.js.map",
+		"oF": 0
+		},
+	"\/login.php": {
+		"cB": 0,
+		"ft": 8192,
+		"oA": 0,
+		"oAP": "\/login.php",
+		"oF": 0
+		},
+	"\/logout.php": {
+		"cB": 0,
+		"ft": 8192,
+		"oA": 0,
+		"oAP": "\/logout.php",
 		"oF": 0
 		},
 	"\/scss\/_alert.scss": {

@@ -37,7 +37,8 @@ $options = array(
 $context = stream_context_create($options);
 $result = @file_get_contents('https://api.buildingos.com/o/token/', false, $context);
 if (!$result) {
-  header('Location: /?err=no_token'); exit();
+  var_dump($result);exit;
+  header('Location: index.php/?err=no_token'); exit(); // incorrect bos credentials, try using different account
 }
 $json = json_decode($result, true);
 $token = $json['access_token'];
@@ -50,14 +51,14 @@ $options = array(
 $context = stream_context_create($options);
 $request = json_decode(file_get_contents('https://api.buildingos.com/organizations', false, $context), true);
 if (!$request) {
-  header('Location: /?err=no_data'); exit();
+  header('Location: index.php/?err=no_data'); exit();
 }
 $orgs = array();
 foreach ($request['data'] as $organization) {
   $orgs[$organization['name']] = $organization['url'];
 }
 if (empty($orgs)) {
-  header('Location: /?err=no_orgs'); exit();
+  header('Location: index.php/?err=no_orgs'); exit();
 }
 ?>
 <!doctype html>
