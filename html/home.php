@@ -7,6 +7,12 @@ if (isset($_COOKIE['user_id'])) {
 } else {
   header('Location: /?err=not_logged_in'); exit();
 }
+$added_email = false;
+if (isset($_POST['add-email'])) {
+  $stmt = $db->prepare('REPLACE INTO notified_emails (user_id, email) VALUES (?, ?)');
+  $stmt->execute([$user_id, $_POST['add-email']]);
+  $added_email = true;
+}
 
 $stmt = $db->prepare('SELECT * FROM meters WHERE id IN (SELECT meter_id FROM active_meters WHERE user_id = ?)');
 $stmt->execute([$user_id]);
@@ -31,6 +37,14 @@ if ($num_active_meters === 0) {
     <div class="container" style="margin-top: 20px">
       <div class="row">
         <div class="col-12">
+          <?php if ($added_email) { ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <strong>Success!</strong> <?php echo $_POST['add-email'] ?> will be emailed when leaks are detected.
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          <?php } ?>
           <a href="logout.php" class="btn btn-primary btn-outline-primary float-right">Log out</a>
         </div>
       </div>
@@ -56,10 +70,20 @@ if ($num_active_meters === 0) {
         </div>
         <div class="col-sm-4">
           <h4>Notified emails</h4>
-          <p class="text-muted">No emails are being notified</p>
-          <form class="form-inline" style="margin-bottom: 20px">
+          <?php
+          $stmt = $db->prepare('SELECT email FROM notified_emails WHERE user_id = ?');
+          $stmt->execute([$user_id]);
+          if ($stmt->rowCount() > 0) {
+            foreach ($stmt->fetchAll() as $row) {
+              echo "<p>{$row['email']}</p>";
+            }
+          } else {
+            echo '<p class="text-muted">No emails are being notified</p>';
+          }
+          ?>
+          <form class="form-inline" style="margin-bottom: 20px" action="" method="POST">
             <label class="sr-only" for="inlineFormInputName2">Add email to be notified</label>
-            <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" placeholder="Email">
+            <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" name="add-email" placeholder="Email">
             <button type="submit" class="btn btn-primary mb-2">Add</button>
           </form>
           <h4>Unmonitored meters</h4>

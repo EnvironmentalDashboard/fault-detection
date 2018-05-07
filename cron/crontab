@@ -1,1 +1,1 @@
-0 * * * * php /src/cron/update_meters.php
+0 * * * * php /src/cron/update_meters.php && python /src/main.py
