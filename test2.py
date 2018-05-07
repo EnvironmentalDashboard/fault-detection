@@ -42,8 +42,8 @@ def main():
     print(data.head())
     print(data.value.describe())
 
-    qlist = defineStates(data)
-    df_mm = markovStates(data,qlist)
+    qv = defineStates(data, 10)
+    df_mm = markovStates(data,qv)
     print("==========stats===========")
     print(min(df_mm))
     print(sum(df_mm)/len(df_mm))
@@ -76,28 +76,58 @@ def standardize(df):
     return data
 
 
-def defineStates(df):
-    q2 = df.value.quantile(0.2)
-    q4 = df.value.quantile(0.4)
-    q6 = df.value.quantile(0.6)
-    q8 = df.value.quantile(0.8)
-    return q2,q4,q6,q8
+def defineStates(df, num_interval):
+    quantile_list = []
+    quantile_values = []
+    for i in range(1, num_interval):
+        quantile = i / num_interval
+        quantile_list.append(quantile)
+    for q in quantile_list:
+        quantile_values.append(df.value.quantile(q))
+    return quantile_values
+
+    # quantile = 1/num_interval
+    # q1 = df.value.quantile(0.2)
+    # q4 = df.value.quantile(0.4)
+    # q6 = df.value.quantile(0.6)
+    # q8 = df.value.quantile(0.8)
+    # return q2,q4,q6,q8
 
 
-def markovStates(df, qlist):
+def markovStates(df, qv):
     # definition of the different state
-    print(qlist)
+    # print(qlist)
     print(df['value'])
-    x1 = (df['value'] <= qlist[0]).astype(int)
-    x2 = ((df['value'] > qlist[0]) & (df['value'] <= qlist[1])).astype(int)
-    x3 = ((df['value'] > qlist[1]) & (df['value'] <= qlist[2])).astype(int)
-    x4 = ((df['value'] > qlist[2]) & (df['value'] <= qlist[3])).astype(int)
-    x5 = (df['value'] > qlist[3]).astype(int)
-    df_mm = x1 + 2 * x2 + 3 * x3 + 4 * x4 + 5 * x5
-    # df_mm = x1 + x2 + x3 + x4 + x5
+    states = []
+    for i in range(len(qv)):
+        if i == 0:
+            temp = (df['value'] <= qv[i]).astype(int)
+            states.append(temp)
+        elif i == len(qv)-1:
+            temp = (df['value'] > qv[i]).astype(int)
+            states.append(temp)
+        else:
+            temp = ((df['value'] > qv[i-1]) & (df['value'] <= qv[i])).astype(int)
+            states.append(temp)
 
-    print("==========df_mm==========\n",df_mm)
+    df_mm = states[0]
+    for i in range(1,len(states)):
+        df_mm = (i+1)*states[i] + df_mm
+    print('================df_mm===================')
+    print(df_mm)
     return df_mm
+
+    #
+    # x1 = (df['value'] <= qlist[0]).astype(int)
+    # x2 = ((df['value'] > qlist[0]) & (df['value'] <= qlist[1])).astype(int)
+    # x3 = ((df['value'] > qlist[1]) & (df['value'] <= qlist[2])).astype(int)
+    # x4 = ((df['value'] > qlist[2]) & (df['value'] <= qlist[3])).astype(int)
+    # x5 = (df['value'] > qlist[3]).astype(int)
+    # df_mm = x1 + 2 * x2 + 3 * x3 + 4 * x4 + 5 * x5
+    # # df_mm = x1 + x2 + x3 + x4 + x5
+    #
+    # print("==========df_mm==========\n",df_mm)
+    # return df_mm
 
 #create a transition matrix
 def transition_matrix_fcn(transitions):
