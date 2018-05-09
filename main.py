@@ -1,5 +1,6 @@
 import config
 from sqlalchemy import *
+import threshold as th
 
 def main():
 	engine = create_engine(config.sqlalchemy_uri)
@@ -16,7 +17,7 @@ def main():
 
 # returns an array where first param is whether or not to send an email, second is some indication of how much water has been lost
 def water_leak(con, meter_id):
-	print(meter_id)
+	df, peak_th, base_th = th.threshold(464)
 	return [false, 'rest of data']
 
 def notify(con, user_id, data):
