@@ -328,8 +328,6 @@ class BuildingOS {
             if (!in_array($meter['uuid'], $bos_uuids)) {
               $stmt = $this->db->prepare('DELETE FROM meters WHERE uuid = ?');
               $stmt->execute(array($meter['uuid']));
-              $stmt = $this->db->prepare('DELETE FROM relative_values WHERE meter_uuid = ?');
-              $stmt->execute(array($meter['uuid']));
               $stmt = $this->db->prepare('DELETE FROM meter_data WHERE meter_id = ?');
               $stmt->execute(array($meter['id']));
             }

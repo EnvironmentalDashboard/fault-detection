@@ -7,8 +7,9 @@ if (isset($_POST['create_account'])) {
   $stmt->execute([$_POST['account_email'], password_hash($_POST['account_password'])]);
   $user_id = $db->lastInsertId();
   $stmt = $db->prepare('INSERT INTO api (user_id, client_id, client_secret, username, password) VALUES (?, ?, ?, ?, ?)');
-  $stmt->execute([$user_id, $_POST['client_id'], $_POST['client_secret'], $_POST['account_email'], $_POST['account_password']]);
+  $stmt->execute([$user_id, $_POST['client_id'], $_POST['client_secret'], $_POST['email'], $_POST['password']]);
   $api_id = $db->lastInsertId();
+  $org_urls = [];
   foreach ($_POST['org'] as $org) {
     $split = explode('$SEP$', $org);
     $stmt = $db->prepare('INSERT INTO orgs (api_id, name, url) VALUES (?, ?, ?)');
@@ -16,8 +17,15 @@ if (isset($_POST['create_account'])) {
     $org_id = $db->lastInsertId();
     $stmt = $db->prepare('INSERT INTO users_orgs_map (user_id, org_id) VALUES (?, ?)');
     $stmt->execute([$user_id, $org_id]);
+    $org_urls[] = $split[0];
   }
   setcookie('user_id', $user_id, time()+31104000);
+  ob_start(); // TODO: make this happen async in diff script
+  $bos = new BuildingOS($db, [$_POST['client_id'], $_POST['client_secret'], $_POST['email'], $_POST['password']]);
+  foreach ($org_urls as $org_url) {
+    $bos->syncBuildings($org_url, true);
+  }
+  ob_clean();
   header('Location: home.php'); exit();
 }
 // Get list of orgs for form

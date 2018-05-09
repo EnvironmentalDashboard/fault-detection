@@ -43,6 +43,7 @@
           <div class="col-sm-6">
             <h1 class="display-4">Get notified when leaks are detected in your water meters</h1>
             <p class="lead">Have a BuildingOS account? Sign in to create an account</p>
+            <p><a href="#" class="btn btn-light btn-lg" data-toggle="modal" data-target="#info">Learn more</a></p>
           </div>
           <div class="col-sm-6">
             <form action="continue.php" method="POST" class="needs-validation" novalidate>
@@ -61,14 +62,14 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="client_id">Client ID</label>
+                <label for="client_id">Client ID</label><img tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="Create an API client" data-content="Log into BuildingOS and navigate to settings and then the Developer API. Click &quot;Add an API Client&quot; and select &quot;Resource owner password-based&quot; and then save. You will be able to see the client ID and client secret in the table." src="images/question.svg" alt="Help icon" width="17" height="17" style="position: relative;left: 5px;cursor: pointer;">
                 <input type="text" class="form-control" id="client_id" name="client_id" required>
                 <div class="invalid-feedback">
                   Please do not leave this field blank.
                 </div>
               </div>
               <div class="form-group">
-                <label for="client_secret">Client Secret</label>
+                <label for="client_secret">Client Secret</label><img tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="Create an API client" data-content="Log into BuildingOS and navigate to settings and then the Developer API. Click &quot;Add an API Client&quot; and select &quot;Resource owner password-based&quot; and then save. You will be able to see the client ID and client secret in the table." src="images/question.svg" alt="Help icon" width="17" height="17" style="position: relative;left: 5px;cursor: pointer;">
                 <input type="text" class="form-control" id="client_secret" name="client_secret" required>
                 <div class="invalid-feedback">
                   Please do not leave this field blank.
@@ -118,10 +119,32 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="info" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="infoLabel">What is this?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>If you have a BuildingOS account you can use this service to monitor your water meters for leaks. Every hour we pull new data from BuildingOS and email you we detect anomalous use.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script>
+      $(function () {
+        $('[data-toggle="popover"]').popover({trigger: 'focus'});
+      });
       $("#login_form").submit(function(e){
         e.preventDefault();
         var email = $('#login_email').val(), pass = $('#login_password').val();
