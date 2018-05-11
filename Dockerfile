@@ -3,9 +3,7 @@ ENV DEBIAN_FRONTEND=noninteractive TZ=America/New_York APACHE_RUN_USER=www-data 
 COPY . /src
 WORKDIR /src
 RUN apt-get update && \
-  apt-get -qq -y install apt-utils cron tzdata python python-pip python-tk libmysqlclient-dev apache2 php libapache2-mod-php php-mysql curl software-properties-common && \
-  add-apt-repository ppa:certbot/certbot && apt-get update && apt-get install python-certbot-apache && \
-  certbot certonly --noninteractive --apache --agree-tos --email trobertf@oberlin.edu --webroot -w /var/www/html -d envs356.oberlindashboard.org && \
+  apt-get -qq -y install apt-utils cron tzdata python python-pip python-tk libmysqlclient-dev apache2 php libapache2-mod-php php-mysql curl && \
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
   rm -rf /var/www/html && ln -snf /src/html /var/www/html && \
   pip install -r requirements.txt && \

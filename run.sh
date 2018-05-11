@@ -8,6 +8,6 @@ then
 	docker build -t fault-detection-image . # build image, tag with fault-detection
 	docker run -p 8080:80 --rm -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$IP:0 --name fault-detection-container -v $(pwd):/src -dit fault-detection-image # run container from image (--rm deletes container on exit, --name tags container, -v mounts code)
 else # production build
-	docker build -t fault-detection-image .
+	docker build -t fault-detection-image . && \
 	docker run -p 8080:80 --rm --name fault-detection-container -v $(pwd):/src -dit fault-detection-image
 fi
