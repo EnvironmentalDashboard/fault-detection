@@ -33,6 +33,17 @@
 		"oAP": "\/home.php",
 		"oF": 0
 		},
+	"\/images\/meter464_thres_leak.png": {
+		"ft": 32768,
+		"iS": 59739,
+		"oA": 0,
+		"oAP": "\/images\/meter464_thres_leak.png",
+		"oF": 0,
+		"oIPL": 0,
+		"opt": 0,
+		"oT": 1,
+		"q": 100
+		},
 	"\/images\/question.svg": {
 		"ft": 2097152,
 		"miP": 0,

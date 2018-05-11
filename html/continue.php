@@ -3,8 +3,9 @@ error_reporting(-1);
 ini_set('display_errors', 'On');
 require '../db.php';
 if (isset($_POST['create_account'])) {
+  require '../bos/class.bos.php';
   $stmt = $db->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-  $stmt->execute([$_POST['account_email'], password_hash($_POST['account_password'])]);
+  $stmt->execute([$_POST['account_email'], password_hash($_POST['account_password'], PASSWORD_DEFAULT)]);
   $user_id = $db->lastInsertId();
   $stmt = $db->prepare('INSERT INTO api (user_id, client_id, client_secret, username, password) VALUES (?, ?, ?, ?, ?)');
   $stmt->execute([$user_id, $_POST['client_id'], $_POST['client_secret'], $_POST['email'], $_POST['password']]);

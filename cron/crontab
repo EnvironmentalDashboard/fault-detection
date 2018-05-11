@@ -1,1 +1,2 @@
-0 * * * * php /src/cron/update_meters.php && python /src/main.py
+#0 * * * * php /src/cron/update_meters.php && python /src/main.py
+#* * * * * php /src/email/send_emails.php
