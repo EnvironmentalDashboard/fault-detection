@@ -61,6 +61,13 @@
 		"oAP": "\/includes\/active_meters.php",
 		"oF": 0
 		},
+	"\/includes\/no_more_leaks.php": {
+		"cB": 0,
+		"ft": 8192,
+		"oA": 0,
+		"oAP": "\/includes\/no_more_leaks.php",
+		"oF": 0
+		},
 	"\/index.php": {
 		"cB": 0,
 		"ft": 8192,

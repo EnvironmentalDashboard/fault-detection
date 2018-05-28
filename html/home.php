@@ -14,7 +14,7 @@ if (isset($_POST['add-email'])) {
   $added_email = true;
 }
 
-$stmt = $db->prepare('SELECT * FROM meters WHERE id IN (SELECT meter_id FROM active_meters WHERE user_id = ?)');
+$stmt = $db->prepare('SELECT id, name, last_leak FROM meters WHERE id IN (SELECT meter_id FROM active_meters WHERE user_id = ?)');
 $stmt->execute([$user_id]);
 $active_meters = $stmt->fetchAll();
 $active_meters_ids = array_column($active_meters, 'id');
@@ -24,6 +24,7 @@ if ($num_active_meters === 0) {
 } else {
   $zero = false;
 }
+$looks_good = '<div style="display:inline-block;margin-right:5px;height:10px;width:10px;border-radius:100%;background:green"></div><span style="font-size:70%">Looks good</span>';
 ?>
 <!doctype html>
 <html lang="en">
@@ -56,14 +57,18 @@ if ($num_active_meters === 0) {
             <thead>
               <tr>
                 <th scope="col">Meter</th>
-                <th scope="col">Last Updated</th>
                 <th scope="col">Status</th>
                 <th scope="col">Remove</th>
               </tr>
             </thead>
             <tbody id="tbody">
               <?php foreach ($active_meters as $meter) {
-                echo "<tr id='meter{$meter['id']}'><td>{$meter['name']}</td><td>Never</td><td>&middot;</td><td><a href='#' class='close btn remove-btn' data-meterid='{$meter['id']}'><span>&times;</span></a></td></tr>";
+                $status = $looks_good;
+                if ($meter['last_leak'] != 0) {
+                  $date = date('F j, g:i a', $meter['last_leak']);
+                  $status = "<div style='display:inline-block;margin-right:5px;height:10px;width:10px;border-radius:100%;background:red'></div><span style='font-size:70%'>Leak detected on {$date}</span><p><a href='#' class='btn btn-sm btn-outline-primary resolved-btn' data-meterid='{$meter['id']}' style='padding:4px;font-size:70%;color:#fff'>Mark as resolved</a></p>";
+                }
+                echo "<tr id='meter{$meter['id']}'><td>{$meter['name']}</td><td>{$status}</td><td><a href='#' class='close btn remove-btn float-left' data-meterid='{$meter['id']}'><span style='color:#fff'>&times;</span></a></td></tr>";
               } ?>
             </tbody>
           </table>
@@ -132,7 +137,7 @@ if ($num_active_meters === 0) {
         $('#no-meters-msg').css('display', 'none');
       }
       var id = $(this).data('id'), name = $(this).data('name');
-      $('#tbody').append('<tr id="meter'+id+'"><td>'+name+'</td><td>Never</td><td>&middot;</td><td><a href="#" class="close btn remove-btn" data-meterid="'+id+'"><span>&times;</span></a></td></tr>');
+      $('#tbody').append('<tr id="meter'+id+'"><td>'+name+'</td><td><?php echo $looks_good ?></td><td><a href="#" class="close btn remove-btn float-left" data-meterid="'+id+'"><span style="color:#fff">&times;</span></a></td></tr>');
       $(this).css('display', 'none');
       var http = new XMLHttpRequest();
       var url = "includes/active_meters.php";
@@ -158,6 +163,17 @@ if ($num_active_meters === 0) {
         $('#table').css('display', 'none');
         $('#no-meters-msg').css('display', '');
       }
+    });
+    $('.resolved-btn').on('click', function(e) {
+      e.preventDefault();
+      var http = new XMLHttpRequest();
+      var url = "includes/no_more_leaks.php";
+      var params = "meterid="+($(this).data('meterid'));
+      http.open("POST", url, true);
+      http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      http.send(params);
+      var td = $(this).parents()[1];
+      $(td).html('<?php echo $looks_good ?>');
     });
 
     (function() {
